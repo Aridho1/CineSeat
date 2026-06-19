@@ -9,13 +9,18 @@ package cineseat;
  * @author rahma
  */
 public class PremiumSeat extends Seat {
+
     public PremiumSeat(String seatNumber) {
         super(seatNumber);
     }
-    
+
     @Override
-    public int getHarga() {
-        return 80000;
+    public int getExtraPrice() {
+        return 30000;
     }
-    
+
+    @Override
+    public String getFacility() {
+        return "Recliner Seat + Charger + Free Popcorn";
+    }
 }

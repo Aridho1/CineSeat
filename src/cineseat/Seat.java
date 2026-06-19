@@ -9,12 +9,18 @@ package cineseat;
  * @author rahma
  */
 public abstract class Seat {
+
     protected String seatNumber;
-    protected boolean isSelected = false;
-    
+
     public Seat(String seatNumber) {
         this.seatNumber = seatNumber;
     }
-    
-    public abstract int getHarga();
+
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public abstract int getExtraPrice();
+
+    public abstract String getFacility();
 }

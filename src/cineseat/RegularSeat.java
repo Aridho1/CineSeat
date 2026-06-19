@@ -9,12 +9,18 @@ package cineseat;
  * @author rahma
  */
 public class RegularSeat extends Seat {
+
     public RegularSeat(String seatNumber) {
         super(seatNumber);
     }
-    
+
     @Override
-    public int getHarga() {
-        return 50000;
+    public int getExtraPrice() {
+        return 0;
+    }
+
+    @Override
+    public String getFacility() {
+        return "Standard Seat";
     }
 }
