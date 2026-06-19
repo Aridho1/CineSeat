@@ -26,6 +26,11 @@ public class MainFrame extends javax.swing.JFrame {
     private Movie currentMovie;
     private boolean loadingMovies;
     private boolean changingMovie;
+    private static final int TOTAL_COLS = 5;
+    private static final int TOTAL_ROWS = 7;
+    private static final int PREMIUM_ROWS = 2;
+    private static final int MIN_BOOKED_SEAT = 5;
+    private static final int MAX_BOOKED_SEAT = 11;
     
     /**
      * Creates new form MainFrame
@@ -76,10 +81,12 @@ public class MainFrame extends javax.swing.JFrame {
 
     private ArrayList<String> createRandomBookedSeats() {
         ArrayList<String> bookedSeats = new ArrayList<>();
+        
+        final int maxBookedSeat = MIN_BOOKED_SEAT + random.nextInt((MAX_BOOKED_SEAT - MIN_BOOKED_SEAT) + 1);
 
         // Looping: keep generating random seats until six unique seats are booked.
-        while (bookedSeats.size() < 6) {
-            char row = (char) ('A' + random.nextInt(7));
+        while (bookedSeats.size() < maxBookedSeat) {
+            char row = (char) ('A' + random.nextInt(TOTAL_ROWS));
             int number = random.nextInt(5) + 1;
             String seatNumber = String.valueOf(row) + number;
 
@@ -147,12 +154,24 @@ public class MainFrame extends javax.swing.JFrame {
             selectedSeats = new ArrayList<>();
             selectedSeatsByMovie.put(currentMovie, selectedSeats);
         }
+        
+        for (int rowIndex = 0; rowIndex < TOTAL_ROWS; rowIndex++) {
+
+            char row = (char) ('A' + rowIndex);
+
+            for (int number = 1; number <= TOTAL_COLS; number++) {
+
+                String seatNumber = String.valueOf(row) + number;
+
+                Seat seat = createSeat(row, seatNumber);
+//            }
+//        }
 
         // Looping: rows A-G and seats 1-5 are created dynamically.
-        for (char row = 'A'; row <= 'G'; row++) {
-            for (int number = 1; number <= 5; number++) {
-                String seatNumber = String.valueOf(row) + number;
-                Seat seat = createSeat(row, seatNumber);
+//        for (char row = 'A'; row <= 'G'; row++) {
+//            for (int number = 1; number <= 5; number++) {
+//                String seatNumber = String.valueOf(row) + number;
+//                Seat seat = createSeat(row, seatNumber);
                 JCheckBox seatBox = new JCheckBox(seatNumber);
 
                 seatMap.put(seatBox, seat);
@@ -175,17 +194,19 @@ public class MainFrame extends javax.swing.JFrame {
         pnlSeats.revalidate();
         pnlSeats.repaint();
     }
-
+    
     private Seat createSeat(char row, String seatNumber) {
-        // Switch case: row F and row G use PremiumSeat, the other rows use RegularSeat.
-        switch (row) {
-            case 'F':
-            case 'G':
-                // Inheritance: PremiumSeat extends Seat and has a different extra price.
+        int rowIndex = row - 'A';
+        
+        // Switch case: PREMIUM_ROWS lat row use PremiumSeat, the other rows use RegularSeat.
+        switch (rowIndex >= TOTAL_ROWS - PREMIUM_ROWS) {
+            case true -> {
                 return new PremiumSeat(seatNumber);
-            default:
-                // Inheritance: RegularSeat extends Seat and can still be stored as Seat.
+            }
+
+            case false -> {
                 return new RegularSeat(seatNumber);
+            }
         }
     }
 
