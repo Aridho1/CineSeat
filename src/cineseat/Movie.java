@@ -11,6 +11,7 @@ package cineseat;
 public class Movie {
 
     private String title;
+    private String originTitle;
     private int price;
 
     public Movie(String title, int price) {
@@ -21,6 +22,11 @@ public class Movie {
     public String getTitle() {
         return title;
     }
+    
+    public String setDisplayTitle(String t) {
+        originTitle = title;
+        return title = t;
+    };
 
     public int getPrice() {
         return price;

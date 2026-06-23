@@ -4,6 +4,7 @@
  */
 package cineseat;
 
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -63,17 +64,28 @@ public class MainFrame extends javax.swing.JFrame {
     private void initMovies(){
         movies.clear();
         cmbMovies.removeAllItems();
+        cmbMovies.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
-        movies.add(new Movie("Avengers", 50000));
-        movies.add(new Movie("Spider-Man", 45000));
+        movies.add(new Movie("Avanger", 50000));
+        movies.add(new Movie("Spiderman", 45000));
         movies.add(new Movie("Batman", 40000));
 
-        // Looping: every Movie object is added to the combo box.
-        for (int i = 0; i < movies.size(); i++) {
-            cmbMovies.addItem(movies.get(i));
+        int maxLength = 0;
+        for(Movie m : movies){
+            maxLength = Math.max(maxLength, m.getTitle().length());
+        }
+
+        for(Movie m : movies){
+            String display = String.format(
+                "%-" + maxLength + "s | %s",
+                m.getTitle(),
+                currencyFormat(m.getPrice())
+            );
+            m.setDisplayTitle(display);
+            cmbMovies.addItem(m);
         }
     }
-
+    
     private void initMovieSeatStates() {
         ArrayList<ArrayList<String>> usedBookedSeats = new ArrayList<>();
 
@@ -183,7 +195,7 @@ public class MainFrame extends javax.swing.JFrame {
                 JCheckBox seatBox = new JCheckBox(seatNumber);
 
                 seatMap.put(seatBox, seat);
-                seatBox.setToolTipText(getSeatTypeName(seat) + " extra price: " + seat.getExtraPrice());
+                seatBox.setToolTipText(getSeatTypeName(seat) + " extra price: " + currencyFormat(seat.getExtraPrice()));
 
                 if (bookedSeats.contains(seatNumber)) {
                     seatBox.setText(seatNumber + " Booked");
