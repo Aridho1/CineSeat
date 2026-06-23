@@ -1,53 +1,58 @@
-﻿# CineSeat
+﻿
+Contoh:
 
-CineSeat is a Java Swing cinema ticket booking system built with a NetBeans JFrame Form.
+Film: Avengers (50000)
 
-The application lets a customer choose a movie, manually select available seats, and print a booking receipt. Random booked seats simulate seats already taken by other customers.
+Kursi dipilih:
+- A1 (Premium) +30000
+- A2 (Premium) +30000
+- C1 (Regular) +0
 
-## Features
+Per tiket:
+- A1 = 80000
+- A2 = 80000
+- C1 = 50000
 
-- Customer name input
-- Movie selection with `JComboBox`
-- Dynamic seat layout using Swing components
-- Manual seat selection
-- Disabled booked seats
-- Separate booked and selected seat state per movie
-- Random booked seats per movie
-- Generate Seats button to refresh current movie seating condition
-- Book Ticket button to calculate and display receipt
-- Reset button to clear current booking
+Total:
+210000
 
-## Movies
+---
 
-| Movie | Base Price |
-|------|-----------:|
-| Avengers | 50000 |
-| Spider-Man | 45000 |
-| Batman | 40000 |
+## Konsep yang Digunakan
 
-## Seat Rules
+- Looping → pembuatan kursi
+- If-Else → validasi kursi booked / type seat
+- Switch Case → digunakan pada bagian logika tertentu (row/flow UI)
+- Inheritance → Seat, RegularSeat, PremiumSeat
+- Polymorphism → getExtraPrice()
+- JFrame Form → GUI aplikasi
 
-The cinema layout uses 7 rows and 5 seats per row.
+---
 
-Seat layout order:
+## State Film
 
-G
-F
-E
-D
-C
-B
-A
+Setiap film memiliki data terpisah:
 
-Seat types:
+- Kursi yang sudah dibooking
+- Kursi yang dipilih user
 
-A-B = Premium (30000 extra)  
-C-G = Regular (0 extra)
+Data tidak saling tercampur antar film.
 
-Pricing:
-Ticket = Movie Price + Seat Extra  
-Total = sum per seat
+---
 
-Run:
-javac -d build\classes src\cineseat\*.java
-java -cp build\classes cineseat.CineSeat
+## Cara Menjalankan
+
+1. Buka project di NetBeans
+2. Jalankan file MainFrame.java
+3. Pilih film
+4. Pilih kursi
+5. Klik Book Ticket untuk melihat struk
+
+---
+
+## Catatan
+
+- Tidak menggunakan database
+- Tidak menggunakan file storage
+- Semua data hanya disimpan sementara di memory
+- Aplikasi bersifat simulasi
