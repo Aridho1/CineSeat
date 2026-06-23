@@ -4,7 +4,6 @@
  */
 package cineseat;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean loadingMovies;
     private boolean changingMovie;
     private static final int TOTAL_COLS = 7;
-    private static final int TOTAL_ROWS = 7;
+    private static final int TOTAL_ROWS = 10;
     private static final int PREMIUM_ROWS = 2;
     private static final int MIN_BOOKED_SEAT = 5;
     private static final int MAX_BOOKED_SEAT = 11;
@@ -39,10 +38,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        
-        setMinimumSize(new Dimension(700,600));
-        setPreferredSize(new Dimension(1000,700));
-        
+
         loadingMovies = true;
         initMovies();
         loadingMovies = false;
@@ -95,7 +91,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Looping: keep generating random seats until six unique seats are booked.
         while (bookedSeats.size() < maxBookedSeat) {
             char row = (char) ('A' + random.nextInt(TOTAL_ROWS));
-            int number = random.nextInt(5) + 1;
+            int number = random.nextInt(TOTAL_COLS) + 1;
             String seatNumber = String.valueOf(row) + number;
 
             if (!bookedSeats.contains(seatNumber)) {
@@ -149,13 +145,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         pnlSeats.removeAll();
         seatMap.clear();
-        pnlSeats.setLayout(new GridLayout(TOTAL_ROWS, TOTAL_COLS, 20, 10));
-        pnlSeats.setPreferredSize(
-            new Dimension(
-                TOTAL_COLS * 200,
-                TOTAL_ROWS * 200
-            )
-        );
+        pnlSeats.setLayout(new GridLayout(TOTAL_ROWS, TOTAL_COLS, 6, 6));
         
         ArrayList<String> bookedSeats = bookedSeatsByMovie.get(currentMovie);
         ArrayList<String> selectedSeats = selectedSeatsByMovie.get(currentMovie);
@@ -169,8 +159,9 @@ public class MainFrame extends javax.swing.JFrame {
             selectedSeats = new ArrayList<>();
             selectedSeatsByMovie.put(currentMovie, selectedSeats);
         }
-        
-        for (int rowIndex = 0; rowIndex < TOTAL_ROWS; rowIndex++) {
+
+        // Reverse display order in the UI only: back row to front row.
+        for (int rowIndex = TOTAL_ROWS - 1; rowIndex >= 0; rowIndex--) {
 
             char row = (char) ('A' + rowIndex);
 
@@ -179,14 +170,6 @@ public class MainFrame extends javax.swing.JFrame {
                 String seatNumber = String.valueOf(row) + number;
 
                 Seat seat = createSeat(row, seatNumber);
-//            }
-//        }
-
-        // Looping: rows A-G and seats 1-5 are created dynamically.
-//        for (char row = 'A'; row <= 'G'; row++) {
-//            for (int number = 1; number <= 5; number++) {
-//                String seatNumber = String.valueOf(row) + number;
-//                Seat seat = createSeat(row, seatNumber);
                 JCheckBox seatBox = new JCheckBox(seatNumber);
 
                 seatMap.put(seatBox, seat);
@@ -208,18 +191,22 @@ public class MainFrame extends javax.swing.JFrame {
 
         pnlSeats.revalidate();
         pnlSeats.repaint();
+        pack();
     }
     
     private Seat createSeat(char row, String seatNumber) {
         int rowIndex = row - 'A';
+        int premiumLimit = PREMIUM_ROWS;
         
-        // Switch case: PREMIUM_ROWS lat row use PremiumSeat, the other rows use RegularSeat.
-        switch (rowIndex >= TOTAL_ROWS - PREMIUM_ROWS) {
-            case true -> {
-                return new PremiumSeat(seatNumber);
+        // Switch case: the first PREMIUM_ROWS alphabetical rows use PremiumSeat.
+        switch (premiumLimit) {
+            case 0 -> {
+                return new RegularSeat(seatNumber);
             }
-
-            case false -> {
+            default -> {
+                if (rowIndex < premiumLimit) {
+                    return new PremiumSeat(seatNumber);
+                }
                 return new RegularSeat(seatNumber);
             }
         }
@@ -274,7 +261,9 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         int moviePrice = currentMovie.getPrice();
-        int seatExtra = 0;
+        int movieBaseTotal = 0;
+        int seatExtraTotal = 0;
+        int subTotalSeats = 0;
         StringBuilder receipt = new StringBuilder();
 
         receipt.append("Customer:\n");
@@ -289,16 +278,23 @@ public class MainFrame extends javax.swing.JFrame {
 
             // Polymorphism: Seat can hold RegularSeat or PremiumSeat.
             // The correct getExtraPrice() runs based on the real object type.
-            seatExtra = seatExtra + seat.getExtraPrice();
+            int ticketPrice = moviePrice + seat.getExtraPrice();
+
+            movieBaseTotal = movieBaseTotal + moviePrice;
+            seatExtraTotal = seatExtraTotal + seat.getExtraPrice();
+            subTotalSeats = subTotalSeats + ticketPrice;
             receipt.append(seatNumber).append(" - ").append(getSeatTypeName(seat)).append("\n");
         }
 
-        int total = moviePrice + seatExtra;
+        int total = movieBaseTotal + subTotalSeats;
 
         receipt.append("\nMovie Price:\n");
-        receipt.append(moviePrice).append("\n\n");
+        receipt.append(moviePrice).append(" x ").append(selectedSeats.size()).append(" = ")
+                .append(movieBaseTotal).append("\n\n");
         receipt.append("Seat Extra:\n");
-        receipt.append(seatExtra).append("\n\n");
+        receipt.append(seatExtraTotal).append("\n\n");
+        receipt.append("Sub Total Seats:\n");
+        receipt.append(subTotalSeats).append("\n\n");
         receipt.append("Total:\n");
         receipt.append(total);
 
@@ -375,7 +371,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelSeats.setText("Seat Layout");
 
         pnlSeats.setBorder(javax.swing.BorderFactory.createTitledBorder("Rows A-G"));
-        pnlSeats.setLayout(new java.awt.GridLayout(7, 5));
+        pnlSeats.setLayout(new java.awt.GridLayout(1, 1));
 
         btnGenerateSeats.setText("Generate Seats");
         btnGenerateSeats.addActionListener(this::btnGenerateSeatsActionPerformed);
@@ -408,10 +404,10 @@ public class MainFrame extends javax.swing.JFrame {
                                     .addComponent(jLabelMovie))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtCustomerName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cmbMovies, 0, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(txtCustomerName, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                                    .addComponent(cmbMovies, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jLabelSeats)
-                            .addComponent(pnlSeats, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pnlSeats, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnGenerateSeats)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -421,8 +417,8 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabelReceipt)
-                            .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(224, Short.MAX_VALUE))
+                            .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -440,7 +436,7 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabelSeats)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pnlSeats, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pnlSeats, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnGenerateSeats)
@@ -449,8 +445,8 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelReceipt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(220, Short.MAX_VALUE))
+                        .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         pack();
