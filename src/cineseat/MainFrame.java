@@ -34,8 +34,10 @@ public class MainFrame extends javax.swing.JFrame {
     private static final int TOTAL_COLS = 7;
     private static final int TOTAL_ROWS = 10;
     private static final int PREMIUM_ROWS = 2;
-    private static final int MIN_BOOKED_SEAT = 5;
-    private static final int MAX_BOOKED_SEAT = 11;
+//    private static final int MIN_BOOKED_SEAT = 5;
+//    private static final int MAX_BOOKED_SEAT = 11;
+    private static final double MIN_BOOKED_PERCENT = 0.15;
+    private static final double MAX_BOOKED_PERCENT = 0.35;
     
     private static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
     
@@ -117,14 +119,20 @@ public class MainFrame extends javax.swing.JFrame {
 
     private ArrayList<String> createRandomBookedSeats() {
         ArrayList<String> bookedSeats = new ArrayList<>();
-        
-        final int maxBookedSeat = MIN_BOOKED_SEAT + random.nextInt((MAX_BOOKED_SEAT - MIN_BOOKED_SEAT) + 1);
 
-        // Looping: keep generating random seats until six unique seats are booked.
-        while (bookedSeats.size() < maxBookedSeat) {
+        int totalSeats = TOTAL_ROWS * TOTAL_COLS;
+
+        double randomPercent =
+                MIN_BOOKED_PERCENT +
+                (random.nextDouble() * (MAX_BOOKED_PERCENT - MIN_BOOKED_PERCENT));
+
+        int targetBooked = (int) Math.round(totalSeats * randomPercent);
+
+        while (bookedSeats.size() < targetBooked) {
             char row = (char) ('A' + random.nextInt(TOTAL_ROWS));
-            int number = random.nextInt(TOTAL_COLS) + 1;
-            String seatNumber = String.valueOf(row) + number;
+            int col = random.nextInt(TOTAL_COLS) + 1;
+
+            String seatNumber = "" + row + col;
 
             if (!bookedSeats.contains(seatNumber)) {
                 bookedSeats.add(seatNumber);
@@ -133,7 +141,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         return bookedSeats;
     }
-
+    
     private boolean isBookedSeatGroupUsed(ArrayList<String> bookedSeats,
             ArrayList<ArrayList<String>> usedBookedSeats) {
         for (int i = 0; i < usedBookedSeats.size(); i++) {
