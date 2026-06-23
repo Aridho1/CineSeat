@@ -37,6 +37,8 @@ public class MainFrame extends javax.swing.JFrame {
     private static final int MIN_BOOKED_SEAT = 5;
     private static final int MAX_BOOKED_SEAT = 11;
     
+    private static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
+    
     private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("in", "ID"));
     private static final DecimalFormat numFormat = new DecimalFormat("#,###", symbols);
     
@@ -57,6 +59,14 @@ public class MainFrame extends javax.swing.JFrame {
         currentMovie = (Movie) cmbMovies.getSelectedItem();
         buildSeatLayout();
         
+        char lastRow = (char) ('A' + TOTAL_ROWS - 1);
+
+        pnlSeats.setBorder(
+            javax.swing.BorderFactory.createTitledBorder(
+                "Rows " + (TOTAL_ROWS == 1 ? "A" : ("A-" + lastRow))
+            )
+        );
+        
         pack();
         setLocationRelativeTo(null);
     }
@@ -64,7 +74,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initMovies(){
         movies.clear();
         cmbMovies.removeAllItems();
-        cmbMovies.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        cmbMovies.setFont(MONO);
 
         movies.add(new Movie("Avanger", 50000));
         movies.add(new Movie("Spiderman", 45000));
@@ -267,6 +277,8 @@ public class MainFrame extends javax.swing.JFrame {
         if (currentMovie == null) {
             return;
         }
+        
+        txtReceipt.setFont(MONO);
 
         String customerName = txtCustomerName.getText().trim();
 
@@ -283,42 +295,67 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         int moviePrice = currentMovie.getPrice();
-        int movieBaseTotal = 0;
+        int total = 0;
         int seatExtraTotal = 0;
-        int subTotalSeats = 0;
+
         StringBuilder receipt = new StringBuilder();
 
-        receipt.append("Customer:\n");
-        receipt.append(customerName).append("\n\n");
-        receipt.append("Movie:\n");
-        receipt.append(currentMovie.getTitle()).append("\n\n");
-        receipt.append("Selected Seats:\n\n");
+        receipt.append("Customer:\n")
+               .append(customerName).append("\n\n");
 
-        for (int i = 0; i < selectedSeats.size(); i++) {
-            String seatNumber = selectedSeats.get(i);
+        receipt.append("Movie:\n")
+               .append(currentMovie.getTitle())
+//               .append(" | ")
+//               .append(currencyFormat(moviePrice))
+               .append("\n\n");
+
+        receipt.append("Selected Seats:\n\n");
+        
+        int regularCount = 0;
+        int premiumCount = 0;   
+        
+        for (String seatNumber : selectedSeats) {
             Seat seat = createSeat(seatNumber.charAt(0), seatNumber);
 
-            // Polymorphism: Seat can hold RegularSeat or PremiumSeat.
-            // The correct getExtraPrice() runs based on the real object type.
+            if (seat instanceof PremiumSeat) {
+                premiumCount++;
+            } else {
+                regularCount++;
+            }
+        }
+        
+        receipt.append("Summary:\n");
+        receipt.append("Regular Seats : ").append(regularCount).append("\n");
+        receipt.append("Premium Seats : ").append(premiumCount).append("\n\n");
+
+        // Table header
+        receipt.append(String.format("%-6s %-15s %s\n", "Seat", "Type", "Price"));
+        receipt.append("--------------------------------\n");
+
+        for (String seatNumber : selectedSeats) {
+            Seat seat = createSeat(seatNumber.charAt(0), seatNumber);
+
             int ticketPrice = moviePrice + seat.getExtraPrice();
 
-            movieBaseTotal = movieBaseTotal + moviePrice;
-            seatExtraTotal = seatExtraTotal + seat.getExtraPrice();
-            subTotalSeats = subTotalSeats + ticketPrice;
-            receipt.append(seatNumber).append(" - ").append(getSeatTypeName(seat)).append("\n");
+            seatExtraTotal += seat.getExtraPrice();
+            total += ticketPrice;
+
+            receipt.append(String.format(
+                    "%-6s %-15s %s\n",
+                    seatNumber,
+                    getSeatTypeName(seat),
+                    currencyFormat(ticketPrice)
+            ));
         }
 
-        int total = movieBaseTotal + subTotalSeats;
+        receipt.append("\n");
 
-        receipt.append("\nMovie Price:\n");
-        receipt.append(currencyFormat(moviePrice)).append(" x ").append(selectedSeats.size()).append(" = ").append("")
-                .append(currencyFormat(movieBaseTotal)).append("\n\n");
-        receipt.append("Seat Extra:\n");
-        receipt.append(currencyFormat(seatExtraTotal)).append("\n\n");
-        receipt.append("Sub Total Seats:\n");
-        receipt.append(currencyFormat(subTotalSeats)).append("\n\n");
-        receipt.append("Total:\n");
-        receipt.append(currencyFormat(total));
+        receipt.append("Seat Extra Total:\n")
+               .append(currencyFormat(seatExtraTotal))
+               .append("\n\n");
+
+        receipt.append("Total:\n")
+               .append(currencyFormat(total));
 
         txtReceipt.setText(receipt.toString());
     }
