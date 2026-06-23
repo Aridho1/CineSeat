@@ -1,61 +1,10 @@
-﻿
-Contoh:
+﻿# ANCHOR
 
-Film: Avengers (50000)
-
-Kursi dipilih:
-- A1 (Premium) +30000
-- A2 (Premium) +30000
-- C1 (Regular) +0
-
-Per tiket:
-- A1 = 80000
-- A2 = 80000
-- C1 = 50000
-
-Total:
-210000
-
----
-
-## Konsep yang Digunakan
-
-- Looping → pembuatan kursi
-- If-Else → validasi kursi booked / type seat
-- Switch Case → digunakan pada bagian logika tertentu (row/flow UI)
-- Inheritance → Seat, RegularSeat, PremiumSeat
-- Polymorphism → getExtraPrice()
-- JFrame Form → GUI aplikasi
-
----
-
-## State Film
-
-Setiap film memiliki data terpisah:
-
-- Kursi yang sudah dibooking
-- Kursi yang dipilih user
-
-Data tidak saling tercampur antar film.
-
----
-
-## Cara Menjalankan
-
-1. Buka project di NetBeans
-2. Jalankan file MainFrame.java
-3. Pilih film
-4. Pilih kursi
-5. Klik Book Ticket untuk melihat struk
-
----
-
-## ANHOR
-### PPT
+##PPT
 https://docs.google.com/presentation/d/1Jg_er2jlb8mwoxM35UKZeYKDXC8d-jyy/edit?usp=sharing&ouid=117750888484878399277&rtpof=true&sd=true
 
-### MERMAID - DEV
-```mermaid
+## FLOWCHART
+### DEV
 flowchart LR
 
 A[Start Application] --> B[Select Movie]
@@ -94,10 +43,9 @@ Q --> R[Generate Receipt]
 R --> S[Display Receipt]
 
 S --> T[End / Stay in App]
-```
 
-### MERMAID - USER
-```mermaid
+
+### USER
 flowchart LR
 
 A[Start Application] --> B[Enter Customer Name]
@@ -125,16 +73,7 @@ I -->|Yes| K[Process Ticket]
 K --> L[Display Receipt]
 
 L --> M[Finish]
-```
+
 
 ### Mermaid
 https://mermaid.live/edit
-
----
-
-## Catatan
-
-- Tidak menggunakan database
-- Tidak menggunakan file storage
-- Semua data hanya disimpan sementara di memory
-- Aplikasi bersifat simulasi
