@@ -69,6 +69,8 @@ public class MainFrame extends javax.swing.JFrame {
             )
         );
         
+        btnGenerateSeats.setVisible(false);
+        
         pack();
         setLocationRelativeTo(null);
     }
