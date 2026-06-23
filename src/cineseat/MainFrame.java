@@ -4,6 +4,8 @@
  */
 package cineseat;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -26,7 +28,7 @@ public class MainFrame extends javax.swing.JFrame {
     private Movie currentMovie;
     private boolean loadingMovies;
     private boolean changingMovie;
-    private static final int TOTAL_COLS = 5;
+    private static final int TOTAL_COLS = 7;
     private static final int TOTAL_ROWS = 7;
     private static final int PREMIUM_ROWS = 2;
     private static final int MIN_BOOKED_SEAT = 5;
@@ -37,12 +39,18 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        
+        setMinimumSize(new Dimension(700,600));
+        setPreferredSize(new Dimension(1000,700));
+        
         loadingMovies = true;
         initMovies();
         loadingMovies = false;
         initMovieSeatStates();
         currentMovie = (Movie) cmbMovies.getSelectedItem();
         buildSeatLayout();
+        
+        pack();
         setLocationRelativeTo(null);
     }
     
@@ -141,7 +149,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         pnlSeats.removeAll();
         seatMap.clear();
-
+        pnlSeats.setLayout(new GridLayout(TOTAL_ROWS, TOTAL_COLS, 20, 10));
+        pnlSeats.setPreferredSize(
+            new Dimension(
+                TOTAL_COLS * 200,
+                TOTAL_ROWS * 200
+            )
+        );
+        
         ArrayList<String> bookedSeats = bookedSeatsByMovie.get(currentMovie);
         ArrayList<String> selectedSeats = selectedSeatsByMovie.get(currentMovie);
 
@@ -355,37 +370,21 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabelMovie.setText("Movie");
 
-        cmbMovies.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbMoviesActionPerformed(evt);
-            }
-        });
+        cmbMovies.addActionListener(this::cmbMoviesActionPerformed);
 
         jLabelSeats.setText("Seat Layout");
 
         pnlSeats.setBorder(javax.swing.BorderFactory.createTitledBorder("Rows A-G"));
-        pnlSeats.setLayout(new java.awt.GridLayout(7, 5, 6, 6));
+        pnlSeats.setLayout(new java.awt.GridLayout(7, 5));
 
         btnGenerateSeats.setText("Generate Seats");
-        btnGenerateSeats.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGenerateSeatsActionPerformed(evt);
-            }
-        });
+        btnGenerateSeats.addActionListener(this::btnGenerateSeatsActionPerformed);
 
         btnBookTicket.setText("Book Ticket");
-        btnBookTicket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBookTicketActionPerformed(evt);
-            }
-        });
+        btnBookTicket.addActionListener(this::btnBookTicketActionPerformed);
 
         btnReset.setText("Reset");
-        btnReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetActionPerformed(evt);
-            }
-        });
+        btnReset.addActionListener(this::btnResetActionPerformed);
 
         jLabelReceipt.setText("Receipt");
 
@@ -396,33 +395,34 @@ public class MainFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabelTitle)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelTitle)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelCustomerName)
-                            .addComponent(jLabelMovie))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabelCustomerName)
+                                    .addComponent(jLabelMovie))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtCustomerName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmbMovies, 0, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabelSeats)
+                            .addComponent(pnlSeats, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnGenerateSeats)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnBookTicket)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnReset)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtCustomerName)
-                            .addComponent(cmbMovies, 0, 260, Short.MAX_VALUE)))
-                    .addComponent(jLabelSeats)
-                    .addComponent(pnlSeats, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnGenerateSeats)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBookTicket)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnReset)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelReceipt)
-                    .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelReceipt)
+                            .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -449,7 +449,8 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelReceipt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jScrollPaneReceipt, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(220, Short.MAX_VALUE))
         );
 
         pack();
