@@ -5,8 +5,11 @@
 package cineseat;
 
 import java.awt.GridLayout;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -32,6 +35,13 @@ public class MainFrame extends javax.swing.JFrame {
     private static final int PREMIUM_ROWS = 2;
     private static final int MIN_BOOKED_SEAT = 5;
     private static final int MAX_BOOKED_SEAT = 11;
+    
+    private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("in", "ID"));
+    private static final DecimalFormat numFormat = new DecimalFormat("#,###", symbols);
+    
+    private static String currencyFormat(int num) {
+        return "Rp" + numFormat.format(num);
+    };
     
     /**
      * Creates new form MainFrame
@@ -289,14 +299,14 @@ public class MainFrame extends javax.swing.JFrame {
         int total = movieBaseTotal + subTotalSeats;
 
         receipt.append("\nMovie Price:\n");
-        receipt.append(moviePrice).append(" x ").append(selectedSeats.size()).append(" = ")
-                .append(movieBaseTotal).append("\n\n");
+        receipt.append(currencyFormat(moviePrice)).append(" x ").append(selectedSeats.size()).append(" = ").append("")
+                .append(currencyFormat(movieBaseTotal)).append("\n\n");
         receipt.append("Seat Extra:\n");
-        receipt.append(seatExtraTotal).append("\n\n");
+        receipt.append(currencyFormat(seatExtraTotal)).append("\n\n");
         receipt.append("Sub Total Seats:\n");
-        receipt.append(subTotalSeats).append("\n\n");
+        receipt.append(currencyFormat(subTotalSeats)).append("\n\n");
         receipt.append("Total:\n");
-        receipt.append(total);
+        receipt.append(currencyFormat(total));
 
         txtReceipt.setText(receipt.toString());
     }
