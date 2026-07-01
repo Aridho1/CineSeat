@@ -8,11 +8,12 @@ package cineseat;
  *
  * @author rahma
  */
+@SuppressWarnings("unused")
 public class Movie {
 
     private String title;
     private String originTitle;
-    private int price;
+    private final int price;
 
     public Movie(String title, int price) {
         this.title = title;

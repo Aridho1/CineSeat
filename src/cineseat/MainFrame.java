@@ -114,7 +114,7 @@ public class MainFrame extends javax.swing.JFrame {
             } while (isBookedSeatGroupUsed(bookedSeats, usedBookedSeats));
 
             bookedSeatsByMovie.put(movie, bookedSeats);
-            selectedSeatsByMovie.put(movie, new ArrayList<String>());
+            selectedSeatsByMovie.put(movie, new ArrayList<>());
             usedBookedSeats.add(bookedSeats);
         }
     }
@@ -284,21 +284,16 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void bookTicket() {
-        if (currentMovie == null) {
-            return;
-        }
+        if (currentMovie == null) return;
         
         txtReceipt.setFont(MONO);
-
         String customerName = txtCustomerName.getText().trim();
-
         if (customerName.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter customer name.");
             return;
         }
 
         ArrayList<String> selectedSeats = selectedSeatsByMovie.get(currentMovie);
-
         if (selectedSeats == null || selectedSeats.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select at least one seat.");
             return;
@@ -307,20 +302,10 @@ public class MainFrame extends javax.swing.JFrame {
         int moviePrice = currentMovie.getPrice();
         int total = 0;
         int seatExtraTotal = 0;
-
         StringBuilder receipt = new StringBuilder();
-
-        receipt.append("Customer:\n")
-               .append(customerName).append("\n\n");
-
-        receipt.append("Movie:\n")
-               .append(currentMovie.getTitle())
-//               .append(" | ")
-//               .append(currencyFormat(moviePrice))
-               .append("\n\n");
-
+        receipt.append("Customer:\n").append(customerName).append("\n\n");
+        receipt.append("Movie:\n").append(currentMovie.getTitle()).append("\n\n");
         receipt.append("Selected Seats:\n\n");
-        
         int regularCount = 0;
         int premiumCount = 0;   
         
@@ -338,35 +323,20 @@ public class MainFrame extends javax.swing.JFrame {
         receipt.append("Regular Seats : ").append(regularCount).append("\n");
         receipt.append("Premium Seats : ").append(premiumCount).append("\n\n");
 
-        // Table header
         receipt.append(String.format("%-6s %-15s %s\n", "Seat", "Type", "Price"));
         receipt.append("--------------------------------\n");
 
         for (String seatNumber : selectedSeats) {
             Seat seat = createSeat(seatNumber.charAt(0), seatNumber);
-
             int ticketPrice = moviePrice + seat.getExtraPrice();
-
             seatExtraTotal += seat.getExtraPrice();
             total += ticketPrice;
-
-            receipt.append(String.format(
-                    "%-6s %-15s %s\n",
-                    seatNumber,
-                    getSeatTypeName(seat),
-                    currencyFormat(ticketPrice)
-            ));
+            receipt.append(String.format("%-6s %-15s %s\n", seatNumber, getSeatTypeName(seat), currencyFormat(ticketPrice)));
         }
 
         receipt.append("\n");
-
-        receipt.append("Seat Extra Total:\n")
-               .append(currencyFormat(seatExtraTotal))
-               .append("\n\n");
-
-        receipt.append("Total:\n")
-               .append(currencyFormat(total));
-
+        receipt.append("Seat Extra Total:\n").append(currencyFormat(seatExtraTotal)).append("\n\n");
+        receipt.append("Total:\n").append(currencyFormat(total));
         txtReceipt.setText(receipt.toString());
     }
 
